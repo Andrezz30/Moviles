@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">Wiki</string>
+    <string name="app_name">WikiLocation</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="menu_camera">Buscador</string>
-    <string name="menu_gallery">Ver Articulo</string>
     <string name="menu_tools">Configuración</string>
     <string name="menu_share">Compartir</string>
     <string name="menu_send">Enviar</string>
