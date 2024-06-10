@@ -22,20 +22,20 @@
         android:layout_marginTop="16dp"
         android:text="Buscar Texto"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/buscarNotif"
+        app:layout_constraintEnd_toStartOf="@+id/volverMain"
         app:layout_constraintTop_toBottomOf="@id/buscador"
         app:layout_constraintHorizontal_chainStyle="spread" />
 
     <Button
-        android:id="@+id/buscarNotif"
+        android:id="@+id/volverMain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Buscar Notificación"
-        app:layout_constraintStart_toEndOf="@+id/buscar"
+        android:text="Volver"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buscador"
-        app:layout_constraintHorizontal_chainStyle="spread" />
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toEndOf="@+id/buscar"
+        app:layout_constraintTop_toBottomOf="@id/buscador" />
 
     <ListView
         android:id="@+id/listaWiki"
@@ -46,13 +46,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/buscar"
         app:layout_constraintBottom_toBottomOf="parent" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="176dp"
-        tools:layout_editor_absoluteY="125dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

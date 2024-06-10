@@ -17,13 +17,11 @@ import android.widget.ListView
 import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import cr.ac.una.controlfinancierocamera.adapter.BuscadorAdapter
 import cr.ac.una.controlfinancierocamera.clases.page
 import cr.ac.una.controlfinancierocamera.controller.PageController
-import cr.ac.una.controlfinancierocamera.service.LocationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,34 +30,20 @@ import kotlinx.coroutines.withContext
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 
-class ListControlFinancieroFragment : Fragment() {
+class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickListener{
+    private lateinit var volverBoton : Button
 
     private lateinit var buscadorAdapter: BuscadorAdapter
     val pageController = PageController();
     private lateinit var botonBuscar: Button
-    private lateinit var buscarNotificacion : Button
     private lateinit var buscadorView: SearchView
-    var textoBusqueda = ""
-    private var receiver: BroadcastReceiver? = null
 
-    private fun startLocationService() {
-        val serviceIntent = Intent(requireContext(), LocationService::class.java)
-        ContextCompat.startForegroundService(requireContext(), serviceIntent)
-    }
-    private fun stopLocationService() {
-        val serviceIntent = Intent(requireContext(), LocationService::class.java)
-        requireContext().stopService(serviceIntent)
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver!!)
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         /* Registrar el BroadcastReceiver */
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+        /*LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
             object : BroadcastReceiver() {
                 override fun onReceive(context: Context?, intent: Intent?) {
                     val placeName = intent?.getStringExtra("placeName")
@@ -69,10 +53,7 @@ class ListControlFinancieroFragment : Fragment() {
                 }
             },
             IntentFilter("placeNameBroadcast")
-        )
-        //stopLocationService()
-        startLocationService()
-
+        )*/
         return inflater.inflate(R.layout.fragment_list_control_financiero, container, false)
     }
 
@@ -81,32 +62,13 @@ class ListControlFinancieroFragment : Fragment() {
         //cambio
         super.onViewCreated(view, savedInstanceState)
 
+
         botonBuscar = view.findViewById<Button>(R.id.buscar)
         buscadorView = view.findViewById(R.id.buscador)
-        buscarNotificacion = view.findViewById(R.id.buscarNotif)
-        var texto1 = view.findViewById<TextView>(R.id.textView)
+        volverBoton = view.findViewById(R.id.volverMain)
 
-        receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                val placeName = intent?.getStringExtra("placeName")
-                if (placeName != null) {
-                    textoBusqueda = placeName
-                }
-            }
-        }
-
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
-            receiver!!,
-            IntentFilter("placeNameBroadcast")
-        )
-
-
-        buscarNotificacion.setOnClickListener{
-
-            texto1.setText(textoBusqueda)
-            textoBusqueda = textoBusqueda.replace(" ", "_")
-            Log.d("TextoBusqueda", textoBusqueda)
-            insertEntity(textoBusqueda)
+        volverBoton.setOnClickListener {
+            (activity as MainActivity).volverAlMainActivity()
         }
 
         botonBuscar.setOnClickListener {
@@ -120,20 +82,26 @@ class ListControlFinancieroFragment : Fragment() {
         buscadorAdapter = BuscadorAdapter(requireContext(), mutableListOf())
         listView.adapter = buscadorAdapter
 
+
+        // Manejar búsqueda desde los argumentos
+        val searchQuery = arguments?.getString("search_query")
+        if (searchQuery != null) {
+            buscadorView.setQuery(searchQuery, false) // Establecer el texto en la barra de búsqueda
+            insertEntity(searchQuery)
+        }
+
+
         listView.setOnItemClickListener { parent, view, position, id ->
             val selectedItem = buscadorAdapter.getItem(position) as page
-            val bundle = Bundle()
-            bundle.putString("url", selectedItem.url)
-            val fragment = VistaWeb()
-            fragment.arguments = bundle
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.home_content, fragment)
-                .addToBackStack(null)
-                .commit()
+            val url = "https://es.wikipedia.org/wiki/${selectedItem?.title}"
+
+            val intent = Intent(context, VistaWeb::class.java).apply {
+                putExtra("url", url)
+            }
+            context?.startActivity(intent)
         }
 
     }
-
     private fun insertEntity(textoBusqueda: String) {
         lifecycleScope.launch {
             try {
@@ -141,7 +109,7 @@ class ListControlFinancieroFragment : Fragment() {
                     pageController.Buscar(textoBusqueda)
                 }
                 withContext(Dispatchers.Main) {
-                    Log.d("Resultado de la busqueda:0", resultadoBusqueda.toString())
+                    Log.d("Resultado de la busqueda:", resultadoBusqueda.toString())
                     buscadorAdapter.clear()
                     buscadorAdapter.addAll(resultadoBusqueda)
                 }
@@ -158,5 +126,11 @@ class ListControlFinancieroFragment : Fragment() {
             }
         }
     }
-
+    override fun onItemClick(page: page) {
+        val url = "https://es.wikipedia.org/wiki/${page.title}"
+        val intent = Intent(requireContext(), VistaWeb::class.java).apply {
+            putExtra("url", url)
+        }
+        startActivity(intent)
+    }
 }

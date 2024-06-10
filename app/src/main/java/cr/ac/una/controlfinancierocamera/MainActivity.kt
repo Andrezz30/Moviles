@@ -12,11 +12,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+//import androidx.fragment.app.commit
 import com.google.android.material.navigation.NavigationView
-import androidx.core.app.ActivityCompat
 import android.Manifest
+import android.view.View
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import androidx.core.app.ActivityCompat
 import cr.ac.una.controlfinancierocamera.service.LocationService
-
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -30,35 +34,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var toolbar = findViewById<Toolbar>(R.id.toolbar)
+        reemplazarFragmento(Home(), "WikiLocation")
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         drawerLayout = findViewById(R.id.drawer_layout)
 
-        var toggle = ActionBarDrawerToggle(
+
+
+        val toggle = ActionBarDrawerToggle(
             this,
             drawerLayout,
             toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
 
         val navigationView = findViewById<NavigationView>(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.FOREGROUND_SERVICE), LOCATION_PERMISSION_REQUEST_CODE)
-        } else {
-            //startLocationService()
         }
-
     }
-
 
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -79,43 +80,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    /*private fun startLocationService() {
-
-        val serviceIntent = Intent(this, LocationService::class.java)
-        ContextCompat.startForegroundService(this, serviceIntent)
-    }*/
-
-
-    //------------------------wikipedia-----------------
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         val title: Int
         lateinit var fragment: Fragment
-        when (menuItem.getItemId()) {
+        when (menuItem.itemId) {
             R.id.nav_camera -> {
                 title = R.string.menu_camera
                 fragment = ListControlFinancieroFragment()
             }
-            R.id.nav_gallery -> {
-                title = R.string.menu_gallery
-                fragment= VistaWeb()
-
+            R.id.nav_manage -> {
+                title = R.string.menu_tools
             }
-            R.id.nav_manage -> title = R.string.menu_tools
 
-            else -> throw IllegalArgumentException("menu option not implemented!!")
+            else -> {
+                throw IllegalArgumentException("menu option not implemented!!")
+            }
         }
-
 
         reemplazarFragmento(fragment, getString(title))
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
-    fun reemplazarFragmento(fragment: Fragment, title:  String) {
+
+    fun reemplazarFragmento(fragment: Fragment, title: String) {
         supportFragmentManager
             .beginTransaction()
-            //.setCustomAnimations(R.anim.bottom_nav_enter, R.anim.bottom_nav_exit)
             .replace(R.id.home_content, fragment)
             .commit()
         setTitle(title)
     }
+    fun volverAlMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
+
 }

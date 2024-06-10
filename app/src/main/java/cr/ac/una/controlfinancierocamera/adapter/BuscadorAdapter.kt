@@ -16,6 +16,9 @@ import cr.ac.una.controlfinancierocamera.VistaWeb
 
 class BuscadorAdapter(context: Context, pages: List<page>) :
     ArrayAdapter<page>(context, 0, pages) {
+    interface OnItemClickListener {
+        fun onItemClick(page: page)
+    }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.list_busqueda, parent, false)
@@ -37,7 +40,7 @@ class BuscadorAdapter(context: Context, pages: List<page>) :
                 .into(imageView)
         }
 
-        view.setOnClickListener {
+        /*view.setOnClickListener {
             val bundle = Bundle().apply {
                 putSerializable("page", pageItem)
                 putString("url", "https://es.wikipedia.org/wiki/${pageItem?.title}") // Construye la URL del artículo de la lista Wiki
@@ -49,7 +52,7 @@ class BuscadorAdapter(context: Context, pages: List<page>) :
                 .replace(R.id.home_content, fragment)
                 .addToBackStack(null)
                 .commit()
-        }
+        }*/
 
         return view
     }
